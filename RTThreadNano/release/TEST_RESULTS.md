@@ -1,5 +1,7 @@
 # Verification result — IPC and landscape GUI update
 
+Verified hardware: Laoliang open-source oscilloscope V1.1 (STC32G12K128).
+
 Target: STC32G12K128, C251 Source Mode / XSMALL / four-byte IRQ frame, 35 MHz.
 
 - Keil rebuild: 0 errors, 37 C47/C138 unused-parameter/no-effect warnings.
@@ -18,6 +20,6 @@ Target: STC32G12K128, C251 Source Mode / XSMALL / four-byte IRQ frame, 35 MHz.
 - HEX checksums, all six EDATA thread stacks and XDATA heap bounds: PASS.
 - CDC descriptors: PASS.
 
-The original CDC/FinSH version was flashed and verified by the maintainer. This expanded firmware has not yet been physically verified. Native tests mock CPU switching or USB peripherals; the instruction model is not a complete STC simulator. Reduced stack sizes require hardware watermark checks under command, GUI and USB reconnect load.
+The maintainer has flashed and verified the current expanded firmware on the development board, including IPC, dynamic threads and the landscape GUI with its MSH page. Native tests mock CPU switching or USB peripherals; the instruction model is not a complete STC simulator. Reduced stack sizes require hardware watermark checks under command, GUI and USB reconnect load.
 
 Repeat with `tools/build.ps1` and `tools/test.ps1`. After flashing, use `tests/test_usb_board.ps1` and the manual component checks in README.
