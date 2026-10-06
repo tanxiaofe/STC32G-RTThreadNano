@@ -42,7 +42,7 @@
 #endif /* DFS_USING_POSIX */
 
 /* finsh thread */
-#ifndef RT_USING_HEAP
+#if !defined(RT_USING_HEAP) || defined(RT_PORT_STATIC_FINSH)
     static struct rt_thread RT_DATA_STORAGE finsh_thread;
     ALIGN(RT_ALIGN_SIZE)
     static char RT_STACK_STORAGE finsh_thread_stack[FINSH_THREAD_STACK_SIZE];
@@ -797,7 +797,7 @@ int finsh_system_init(void)
 #endif
 #endif
 
-#ifdef RT_USING_HEAP
+#if defined(RT_USING_HEAP) && !defined(RT_PORT_STATIC_FINSH)
     /* create or set shell structure */
     shell = (struct finsh_shell *)rt_calloc(1, sizeof(struct finsh_shell));
     if (shell == RT_NULL)
