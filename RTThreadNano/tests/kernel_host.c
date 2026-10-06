@@ -18,6 +18,15 @@ void demo_stats(rt_uint32_t *b,rt_uint32_t *k,rt_uint32_t *f,rt_uint16_t *ms)
 {*b=12;*k=34;*f=56;*ms=demo_period;}
 void demo_beat_period(rt_uint16_t ms){demo_period=ms;}
 void demo_reset(void){}
+static unsigned char lcd_page;
+void gui_set_page(unsigned char p){lcd_page=p;}
+unsigned char gui_page(void){return lcd_page;}
+static int dyn_running=1;static rt_uint16_t timer_period=200;
+void demo_component_stats(rt_uint32_t *v){int i;for(i=0;i<8;i++)v[i]=i;v[6]=timer_period!=0;v[7]=dyn_running;}
+rt_err_t demo_dynamic_start(void){if(dyn_running)return -RT_ERROR;dyn_running=1;return RT_EOK;}
+void demo_dynamic_stop(void){dyn_running=0;}
+rt_err_t demo_soft_timer(rt_uint16_t ms){timer_period=ms;return RT_EOK;}
+static unsigned char host_heap[4096];
 extern void stc_finsh_table_init(void);
 extern void finsh_thread_entry(void *parameter);
 static const char *terminal_input;
@@ -54,7 +63,7 @@ int main(void)
  assert(sizeof(void*)==4&&sizeof(rt_uint32_t)==4);
  for(i=0;i<32;i++)assert(__rt_ffs((rt_uint32_t)1<<i)==i+1);
  assert(__rt_ffs(0)==0);assert(__rt_ffs(0x80000004U)==3);
- rt_system_timer_init();rt_system_scheduler_init();
+ rt_system_timer_init();rt_system_scheduler_init();rt_system_heap_init(host_heap,host_heap+sizeof(host_heap));
  assert(rt_thread_init(&a,"high",entry,0,sa,sizeof(sa),1,2)==RT_EOK);
  assert(rt_thread_init(&b,"peer",entry,0,sb,sizeof(sb),1,2)==RT_EOK);
  assert(rt_thread_init(&c,"low",entry,0,sc,sizeof(sc),4,2)==RT_EOK);
@@ -87,6 +96,21 @@ int main(void)
  assert(command("beat 1")==-1&&demo_period==200);
  assert(command("stat")==0&&strstr(console_capture,"beat=12 keys=34 lcd=56 period=200"));
  assert(command("ps")==0&&strstr(console_capture,"high")&&strstr(console_capture,"peer"));
+ assert(command("page msh")==0&&lcd_page==2);
+ assert(command("page 3")==-1&&lcd_page==2);
+ assert(command("page ipc")==0&&lcd_page==1);
+ assert(command("page status")==0&&lcd_page==0);
+ assert(command("ipc")==0&&strstr(console_capture,"mq sent="));
+ assert(command("timer off")==0&&timer_period==0);
+ assert(command("timer 150")==0&&timer_period==150);
+ assert(command("timer 11")==-1&&timer_period==150);
+ assert(command("timer on")==0&&timer_period==200);
+ assert(command("dyn stop")==0&&dyn_running==0);
+ assert(command("dyn status")==0&&strstr(console_capture,"stopped"));
+ assert(command("dyn start")==0&&dyn_running==1);
+ assert(command("dyn start")==-RT_ERROR);
+ assert(command("dyn bad")==-1);
+ assert(command("mem")==0&&strstr(console_capture,"XDATA heap total="));
  assert(command("missing_cmd")==-1);
  assert(finsh_system_init()==RT_EOK);
  terminal("echo hello\r");assert(strstr(console_capture,"hello\nmsh >"));

@@ -1,9 +1,11 @@
 /* Actual console C code with a fake USB controller. */
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <rthw.h>
 #include "usb_mock.h"
 #include "../bsp/usb_console.h"
+#include "../app/gui_console.h"
 volatile BYTE UsbResetGeneration,DeviceState,UsbControlLines;
 volatile BOOL UsbInBusy,UsbOutBusy;
 volatile BYTE RxRptr,RxWptr,TxRptr,TxWptr;
@@ -39,8 +41,9 @@ static void empty_tx(void)
 }
 int main(void)
 {
- int i,packets_before;rt_tick_t start;
- usb_console_init();rt_hw_console_output("no cable");assert(TxRptr==TxWptr);
+ int i,packets_before;rt_tick_t start;char lcd_line[GUI_CONSOLE_COLS+1];
+ gui_console_init();usb_console_init();rt_hw_console_output("no cable");assert(TxRptr==TxWptr);
+ gui_console_line(0,lcd_line);assert(!strncmp(lcd_line,"no cable",8));
  DeviceState=DEVSTATE_CONFIGURED;UsbControlLines=1;
  assert(rt_hw_console_getchar()==3);
  TxRptr=TxWptr=0;UsbInBusy=0;for(i=0;i<64;i++)TxBuffer[TxWptr++]=(BYTE)i;
@@ -54,6 +57,7 @@ int main(void)
  assert(rt_hw_console_getchar()=='\r');assert(rt_hw_console_getchar()==-1);assert(rt_hw_console_getchar()=='a');
  TxRptr=0;TxWptr=255;UsbInBusy=1;start=tick_now;
  rt_hw_console_output("A");assert(TxWptr==255&&tick_now-start==200);
+ gui_console_line(0,lcd_line);assert(!strncmp(lcd_line,"no cableA",9));
  host_reads=1;rt_hw_console_output("B");assert(tick_now-start<205);empty_tx();
  wire_size=0;TxRptr=TxWptr=0;UsbInBusy=0;rt_hw_console_output("hello\n");empty_tx();
  assert(wire_size==7&&wire[5]=='\r'&&wire[6]=='\n');

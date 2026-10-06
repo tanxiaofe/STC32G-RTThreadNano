@@ -18,11 +18,13 @@ try {
  Query 'help' 'List commands' | Out-Null
  Query 'version' 'STC32G12K128' | Out-Null
  $threads=Query 'ps' 'stack used/size'
- foreach($name in @('beat','key','lcd','tidle0','tshell')){if($threads -notmatch $name){throw "Missing $name thread"}}
+ foreach($name in @('beat','key','timer','lcd','tidle0','tshell')){if($threads -notmatch $name){throw "Missing $name thread"}}
  $first=Query 'tick' 'tick=(\d+)';$a=[long]([regex]::Match($first,'tick=(\d+)').Groups[1].Value)
  Start-Sleep -Milliseconds 200
  $second=Query 'tick' 'tick=(\d+)';$b=[long]([regex]::Match($second,'tick=(\d+)').Groups[1].Value)
  if($b -le $a){throw 'RTOS tick did not advance.'}
+ Query 'ipc' 'mq sent=\d+ recv=\d+' | Out-Null
+ Query 'mem' 'XDATA heap total=\d+ used=\d+' | Out-Null
  Query 'stat' 'beat=\d+ keys=\d+ lcd=\d+' | Out-Null
  Query 'echo USB_CDC_OK' 'USB_CDC_OK\r?\nmsh >' | Out-Null
  Write-Host 'Board smoke test passed. Also exercise keys and unplug/replug the USB cable.'

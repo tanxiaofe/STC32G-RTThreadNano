@@ -18,7 +18,7 @@ for line in (ROOT/'build/RTThreadNano.hex').read_text().splitlines():
     elif kind==1:break
 
 def symbol(name):
-    m=re.search(r'^\s*([0-9A-F]+)H\s+(?:SYMBOL\s+)?(?:CODE|EDATA)\s+.*?\s'+re.escape(name)+r'\s*$',MAP,re.M)
+    m=re.search(r'^\s*([0-9A-F]+)H\s+(?:SYMBOL\s+)?(?:CODE|EDATA|XDATA)\s+.*?\s'+re.escape(name)+r'\s*$',MAP,re.M)
     assert m,name
     return int(m[1],16)
 
@@ -185,8 +185,9 @@ def tests():
     assert ROM[0xff0000]==0x02 # actual reset vector
     assert ROM[0xff000b]==0x02 # actual Timer0 vector
     assert ROM[0xff00cb]==0x02 # actual USB vector
-    for name,size in [('heartbeat_stack',512),('key_stack',512),('lcd_stack',768),('rt_thread_stack',384),('finsh_thread_stack',1024)]:
+    for name,size in [('dynamic_stack_pool',512),('key_stack',384),('lcd_stack',640),('rt_thread_stack',384),('finsh_thread_stack',768),('_timer_thread_stack',384)]:
         addr=symbol(name);assert 8<=addr and addr+size<=0x1000,(name,addr)
+    heap=symbol('heap_area');assert 0x10000<=heap and heap+2048<=0x12000
     assert 'INTR FRAME:   4 BYTES' in MAP
     assert 'MEMORY MODEL: XSMALL' in MAP
     print('PASS: 750 randomized context scenarios plus Timer0/USB/XDATA pointer cases; all GP registers, DPX, SFR state, PSW0/1, EA, PC, SP; boot/yield/IRQ switching; HEX checksums and EDATA stack bounds')
