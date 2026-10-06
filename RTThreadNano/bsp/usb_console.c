@@ -12,6 +12,7 @@
 #include "usb/usb_req_class.h"
 #endif
 #include "usb_console.h"
+#include "../app/gui_console.h"
 static struct rt_mutex RT_DATA_STORAGE console_mutex;
 static BYTE zlp_needed,seen_reset,connected,previous_cr,last_dtr;
 /* 推进 USB 端点传输；关闭 EA 的短临界区保护共享 FIFO。接收空间恢复后释放 OUT 端点。 */
@@ -75,6 +76,8 @@ void rt_hw_console_output(const char *str)
 {
     /* No blocking or FIFO access in interrupt context. */
     if(!rt_thread_self() || rt_interrupt_get_nest())return;
+    /* 捕获完整输出，即使 USB 未连接或发送超时，LCD 也保留 MSH 内容。 */
+    gui_console_feed(str);
     while(*str)
     {
         if(*str=='\n'&&!put_byte('\r'))break;

@@ -157,7 +157,7 @@ void LCD_Init(void)
 	LCD_RegWriteComd(0x2c);
 
 	
-	SetView_V();		
+	SetView_H();		
 	LCD_delay(1);
 	LCD_Fill_XY(0,0,X_DOTS,Y_DOTS,0x0000);
 
@@ -229,4 +229,23 @@ void	SetView_V(void)
 	LCD_RegWriteData(0x00);
 	LCD_RegWriteData(((480-1)>>8));
 	LCD_RegWriteData(((480-1)&0xff));
+}
+
+void	SetView_H(void)		//ºáÆÁ
+{
+	LCD_RegWriteComd(0x36);
+//	LCD_RegWriteData(0x28);		//ºáÆÁ
+	LCD_RegWriteData(0x2B);		//ºáÆÁ Ðý×ª180¶È
+
+	LCD_RegWriteComd(0x2A);
+	LCD_RegWriteData(0x00);
+	LCD_RegWriteData(0x00);
+	LCD_RegWriteData(((480-1)>>8));
+	LCD_RegWriteData(((480-1)&0xff));
+
+	LCD_RegWriteComd(0x2B);
+	LCD_RegWriteData(0x00);
+	LCD_RegWriteData(0x00);
+	LCD_RegWriteData(((320-1)>>8));
+	LCD_RegWriteData(((320-1)&0xff));
 }

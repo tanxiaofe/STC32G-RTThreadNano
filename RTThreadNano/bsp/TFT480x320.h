@@ -9,7 +9,7 @@
 #define	picture_en		0	//1: 允许加载图片，0：禁止
 
 #define	LCD_sleep_en	0		//1: 允许LCD睡眠,
-#define X_DOTS			320		//480: 横看，320：竖看。
+#define X_DOTS			480		//480: 横看，320：竖看。
 
 #if (X_DOTS == 320)
 	#define Y_DOTS			480
