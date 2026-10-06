@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_proj.xsd">
 
   <SchemaVersion>1.1</SchemaVersion>
@@ -329,7 +329,7 @@
               <FileType>1</FileType>
               <FilePath>.\app\main.c</FilePath>
             </File>
-          </Files>
+          <File><FileName>mem.c</FileName><FileType>1</FileType><FilePath>.\kernel\src\mem.c</FilePath></File><File><FileName>dynamic_stack.c</FileName><FileType>1</FileType><FilePath>.\port\dynamic_stack.c</FilePath></File><File><FileName>gui.c</FileName><FileType>1</FileType><FilePath>.\app\gui.c</FilePath></File><File><FileName>gui_console.c</FileName><FileType>1</FileType><FilePath>.\app\gui_console.c</FilePath></File></Files>
         </Group>
         <Group>
           <GroupName>RT-Thread</GroupName>
