@@ -141,6 +141,10 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
                         rt_uint32_t       tick);
 rt_err_t rt_thread_detach(rt_thread_t thread);
 #ifdef RT_USING_HEAP
+#ifdef RT_USING_ARCH_DYNAMIC_STACK
+void *rt_thread_stack_alloc(rt_size_t size);
+void rt_thread_stack_free(void *stack);
+#endif
 rt_thread_t rt_thread_create(const char *name,
                              void (*entry)(void *parameter),
                              void       *parameter,
