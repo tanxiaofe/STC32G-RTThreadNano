@@ -464,13 +464,24 @@ rt_thread_t rt_thread_create(const char *name,
 {
     struct rt_thread *thread;
     void *stack_start;
+    rt_err_t result;
+    /* 251 栈参数需在分配控制块前检查；失败返回 NULL，不触发换栈。 */
+    if (entry == RT_NULL || priority >= RT_THREAD_PRIORITY_MAX || stack_size < 128 || tick == 0)
+        return RT_NULL;
+#ifdef RT_USING_ARCH_DYNAMIC_STACK
+    if (stack_size > RT_PORT_DYNAMIC_STACK_SIZE) return RT_NULL;
+#endif
 
     thread = (struct rt_thread *)rt_object_allocate(RT_Object_Class_Thread,
                                                     name);
     if (thread == RT_NULL)
         return RT_NULL;
 
+#ifdef RT_USING_ARCH_DYNAMIC_STACK
+    stack_start = rt_thread_stack_alloc((rt_size_t)stack_size);
+#else
     stack_start = (void *)RT_KERNEL_MALLOC(stack_size);
+#endif
     if (stack_start == RT_NULL)
     {
         /* allocate stack failure */
@@ -479,7 +490,7 @@ rt_thread_t rt_thread_create(const char *name,
         return RT_NULL;
     }
 
-    _thread_init(thread,
+    result = _thread_init(thread,
                  name,
                  entry,
                  parameter,
@@ -488,6 +499,16 @@ rt_thread_t rt_thread_create(const char *name,
                  priority,
                  tick);
 
+    if (result != RT_EOK)
+    {
+#ifdef RT_USING_ARCH_DYNAMIC_STACK
+        rt_thread_stack_free(stack_start);
+#else
+        RT_KERNEL_FREE(stack_start);
+#endif
+        rt_object_delete((rt_object_t)thread);
+        return RT_NULL;
+    }
     return thread;
 }
 RTM_EXPORT(rt_thread_create);

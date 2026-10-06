@@ -1387,7 +1387,7 @@ void rt_free_sethook(void (*hook)(void *ptr))
 
 #if defined(RT_USING_HEAP_ISR)
 #elif defined(RT_USING_MUTEX)
-static struct rt_mutex _lock;
+static struct rt_mutex RT_DATA_STORAGE _lock;
 #endif
 
 rt_inline void _heap_lock_init(void)
@@ -1576,6 +1576,9 @@ RTM_EXPORT(rt_realloc);
 RT_WEAK void *rt_calloc(rt_size_t count, rt_size_t size)
 {
     void *p;
+
+    /* C251 rt_size_t is 16-bit: reject multiplication overflow. */
+    if (size != 0 && count > ((rt_size_t)-1) / size) return RT_NULL;
 
     /* allocate 'count' objects of size 'size' */
     p = rt_malloc(count * size);

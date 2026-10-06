@@ -240,13 +240,22 @@ static void rt_defunct_execute(void)
         if (object_is_systemobject == RT_FALSE)
         {
             /* release thread's stack */
+#ifdef RT_USING_ARCH_DYNAMIC_STACK
+            rt_thread_stack_free(thread->stack_addr);
+#else
             RT_KERNEL_FREE(thread->stack_addr);
+#endif
             /* delete thread object */
             rt_object_delete((rt_object_t)thread);
         }
 #endif
     }
 }
+
+#ifdef RT_HOST_TEST
+/* Test the same deferred cleanup routine used by the actual idle thread. */
+void rt_test_defunct_cleanup(void){rt_defunct_execute();}
+#endif
 
 static void rt_thread_idle_entry(void *parameter)
 {

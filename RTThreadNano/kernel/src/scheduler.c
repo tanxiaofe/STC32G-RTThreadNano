@@ -32,6 +32,9 @@
 
 #include <rtthread.h>
 #include <rthw.h>
+#ifdef __C251__
+extern void rt_port_panic(unsigned char reason);
+#endif
 
 rt_list_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
 rt_uint32_t rt_thread_ready_priority_group;
@@ -103,12 +106,15 @@ static void _scheduler_stack_check(struct rt_thread *thread)
         (rt_ubase_t)thread->sp >
         (rt_ubase_t)thread->stack_addr + (rt_ubase_t)thread->stack_size)
     {
+#ifdef __C251__
+        /* Scheduler/IRQ context cannot acquire the console mutex to print. */
+        rt_port_panic(6);
+#else
         rt_base_t level;
-
         rt_kprintf("thread:%s stack overflow\n", thread->name);
-
         level = rt_hw_interrupt_disable();
         while (level);
+#endif
     }
 #ifdef ARCH_CPU_STACK_GROWS_UPWARD
     else if ((rt_ubase_t)thread->sp > ((rt_ubase_t)thread->stack_addr + thread->stack_size))

@@ -2907,7 +2907,7 @@ rt_err_t rt_mq_send_wait(rt_mq_t     mq,
 
     return RT_EOK;
 }
-RTM_EXPORT(rt_mq_send_wait)
+RTM_EXPORT(rt_mq_send_wait);
 
 
 /**

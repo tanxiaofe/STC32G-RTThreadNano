@@ -300,6 +300,8 @@ void *rt_smem_alloc(rt_smem_t m, rt_size_t size)
     }
 
     small_mem = (struct rt_small_mem *)m;
+    /* Check before 16-bit alignment can wrap to zero on C251. */
+    if (size > small_mem->mem_size_aligned) return RT_NULL;
     /* alignment size */
     size = RT_ALIGN(size, RT_ALIGN_SIZE);
 
@@ -432,6 +434,7 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, rt_size_t newsize)
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
     small_mem = (struct rt_small_mem *)m;
+    if (newsize > small_mem->mem_size_aligned) return RT_NULL;
     /* alignment size */
     newsize = RT_ALIGN(newsize, RT_ALIGN_SIZE);
     if (newsize > small_mem->mem_size_aligned)
