@@ -2,13 +2,13 @@
 
 这是为当前 STC32G12K128 / TFT 480×320 V2 开发板新建的独立工程，原有示波器、游戏、模型显示功能没有加入本工程。
 
-内核来自你提供的 `rtthread-nano-master.zip`，版本 **RT-Thread Nano 4.1.1**。FinSH 使用该压缩包中的官方 `components/finsh` 源码，启用 **MSH 命令行模式**。支持原生 USB CDC 虚拟串口；没有使用 USB 转 UART。
+内核采用 **RT-Thread Nano 4.1.1**。FinSH 使用官方 `components/finsh` 源码，启用 **MSH 命令行模式**。支持原生 USB CDC 虚拟串口；没有使用 USB 转 UART。
 
-**验证状态：C251 完整编译、电脑端内核/FinSH/CDC 测试、编译后汇编指令检查已通过。尚未在开发板上烧录验证启动、USB 枚举或实时栈余量。**
+**验证状态：C251 完整编译、电脑端内核/FinSH/CDC 测试、编译后汇编指令检查已通过。已于 2026 年 10 月 6 日完成烧录，并由项目维护者在开发板上验证。**
 
 ## 使用
 
-1. 用 Keil C251 打开 `RTThreadNano.uvproj`，或直接烧录 `release/RTThreadNano-CDC-FinSH.hex`。
+1. 仓库中的工程位于 `RTThreadNano/` 文件夹；进入该目录，用 Keil C251 打开 `RTThreadNano.uvproj`，或直接烧录 `release/RTThreadNano-CDC-FinSH.hex`。
 2. STC-ISP 下载设置使用 **35 MHz**。工程使用 **251 Source Mode、XSMALL、4 字节中断栈帧**；不要修改为 8051 模式或 2 字节中断栈帧。
 3. 烧录结束后复位，通过板上的 MCU 原生 USB 数据口连接电脑。Windows 10/11 的 CDC ACM 驱动匹配依据见下方 Microsoft 文档；本工程设备描述符已设为 `02/02/01`。
 4. 在串口终端打开新出现的 COM 口，115200、8N1、无硬件流控，最好启用 DTR。USB 实际传输不依赖这个名义波特率。关闭终端的本地回显，固件会回显输入。
@@ -84,6 +84,8 @@ USB RX/TX 环形缓冲区各 256 字节。USB 寄存器访问使用短 EA 临界
 
 ## 编译和测试
 
+以下命令在 `RTThreadNano/` 目录中执行：
+
 ```powershell
 .\tools\build.ps1
 .\tools\test.ps1 -Python python
@@ -104,7 +106,7 @@ USB RX/TX 环形缓冲区各 256 字节。USB 寄存器访问使用短 EA 临界
 powershell -ExecutionPolicy Bypass -File .\tests\test_usb_board.ps1 -Port COM7
 ```
 
-此脚本只验证枚举后的串口命令、线程列表及 tick 推进，不替代长时间硬件测试。当前尚未运行此板上脚本。
+此脚本只验证枚举后的串口命令、线程列表及 tick 推进，不替代长时间硬件测试。该脚本可用于重复检查串口命令与系统节拍。
 
 若屏幕停在黑屏/计数不动或没有 COM 口，先确认烧录的是本工程 HEX、35 MHz 设置和 4 字节中断帧；再查看 `rt_port_fault`。错误码：1=栈地址、2/3=切换或线程退出异常、4=初始化失败、5=调度器意外返回、6=演示线程栈尾损坏。
 
@@ -124,4 +126,4 @@ powershell -ExecutionPolicy Bypass -File .\tests\test_usb_board.ps1 -Port COM7
 
 应用线程、板级初始化、LCD 文本、USB CDC 控制台、FinSH 命令表、CPU 上下文切换和内核配置已添加中文注释。上述源码采用 GBK 编码，便于 Keil C251 显示；说明文档采用 UTF-8。注释不改变程序逻辑，第三方源码许可声明保留。
 
-注释更新已通过完整编译和现有软件验证。对比烧录内容，仅版本信息中的编译时间发生变化，代码与其余数据保持一致；尚未进行开发板实测。
+注释更新已通过完整编译和现有软件验证。对比烧录内容，仅版本信息中的编译时间发生变化，代码与其余数据保持一致。项目维护者已完成烧录和开发板验证。
