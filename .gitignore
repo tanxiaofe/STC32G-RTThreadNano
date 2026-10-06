@@ -1,0 +1,9 @@
+RTThreadNano/build/
+**/__pycache__/
+*.zip
+*.uvopt
+*.uvgui.*
+*.obj
+*.crf
+*.lst
+*.pyc
