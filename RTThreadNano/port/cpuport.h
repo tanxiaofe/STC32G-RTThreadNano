@@ -7,4 +7,6 @@ void rt_port_tick(void);
 void rt_port_object_init(void);
 void rt_port_panic(unsigned char reason);
 extern volatile unsigned char rt_port_fault;
+unsigned char rt_port_dynamic_stack_busy(void);
+unsigned char rt_port_dynamic_stack_guard(void);
 #endif
